@@ -35,10 +35,21 @@ async function run() {
         const studyServiceCollection = client.db("studyPlatform").collection("studyServices");
         const notesCollection = client.db("studyPlatform").collection("notes");
 
-        // post users notes api
+        // users notes related api
         app.post('/notes', async (req, res) => {
             const note = req.body;
             const result = await notesCollection.insertOne(note);
+            res.send(result);
+        })
+        app.get('/notes', async (req, res) => {
+            const notes = notesCollection.find();
+            const result = await notes.toArray();
+            res.send(result);
+        })
+        app.delete('/notes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await notesCollection.deleteOne(query);
             res.send(result);
         })
 
