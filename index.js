@@ -33,6 +33,14 @@ async function run() {
 
         const userCollection = client.db("studyPlatform").collection("users");
         const studyServiceCollection = client.db("studyPlatform").collection("studyServices");
+        const notesCollection = client.db("studyPlatform").collection("notes");
+
+        // post users notes api
+        app.post('/notes', async (req, res) => {
+            const note = req.body;
+            const result = await notesCollection.insertOne(note);
+            res.send(result);
+        })
 
         // users related api
         app.post('/users', async (req, res) => {
@@ -55,19 +63,14 @@ async function run() {
 
         app.get('/studyServices/:id', async (req, res) => {
             try {
-              const id = req.params.id;
-              const studyService = await studyServiceCollection.findOne({ _id: new ObjectId(id) });
-          
-              if (!studyService) {
-                return res.status(404).send({ message: 'Study service not found' });
-              }
-          
-              res.send(studyService);
+                const id = req.params.id;
+                const studyService = await studyServiceCollection.findOne({ _id: new ObjectId(id) });
+                res.send(studyService);
             } catch (error) {
-              console.error('Error fetching study service by ID:', error);
-              res.status(500).send({ message: 'Internal server error' });
+                console.error('Error fetching study service by ID:', error);
+                res.status(500).send({ message: 'Internal server error' });
             }
-          });
+        });
 
         // auth related api
         app.post('/jwt', async (req, res) => {
