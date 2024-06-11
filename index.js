@@ -9,7 +9,8 @@ const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173',
+        "assignment-12-66ba7.web.app"],
     credentials: true
 }));
 app.use(express.json());
@@ -29,7 +30,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         const userCollection = client.db("studyPlatform").collection("users");
         const studyServiceCollection = client.db("studyPlatform").collection("studyServices");
@@ -50,6 +51,19 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await notesCollection.findOne(query);
+            res.send(result);
+        })
+        app.patch('/notes/:id', async (req, res) => {
+            const note = req.body;
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    title: note.title,
+                    description: note.description
+                }
+            }
+            const result = await notesCollection.updateOne(filter, updatedDoc);
             res.send(result);
         })
         app.delete('/notes/:id', async (req, res) => {
@@ -104,8 +118,8 @@ async function run() {
         })
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
