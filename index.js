@@ -7,10 +7,17 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
 const port = process.env.PORT || 5000;
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+}
+
 // middleware
 app.use(cors({
-    origin: ['http://localhost:5173',
-        "assignment-12-66ba7.web.app"],
+    origin: [
+        "https://assignment-12-66ba7.web.app"
+    ],
     credentials: true
 }));
 app.use(express.json());
@@ -109,13 +116,9 @@ async function run() {
             console.log(user);
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res
-                .cookie('token', token, {
-                    httpOnly: true,
-                    secure: false,
-                    sameSite: 'none'
-                })
-                .send({ success: true })
-        })
+                .cookie('token', token, cookieOptions)
+                .send({ success: true });
+        });
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
